@@ -1,20 +1,16 @@
 {
-  "name": "quote-generator",
+  "name": "quote-generator-monorepo",
   "version": "1.0.0",
-  "description": "",
-  "main": "app.js",
+  "description": "語錄產生器全端專案",
+  "private": true,
   "scripts": {
-    "dev": "vite"
+    "dev": "concurrently \"npm run dev:frontend\" \"npm run dev:backend\"",
+    "dev:frontend": "cd frontend && npm run dev",
+    "dev:backend": "cd backend && uvicorn main:app --reload --port 8000",
+    "build": "cd frontend && npm run build",
+    "install:all": "cd frontend && npm install && cd ../backend && pip install -r requirements.txt"
   },
-  "keywords": [],
+  "keywords": ["quote", "generator", "fastapi", "vue", "alpine"],
   "author": "",
-  "license": "ISC",
-  "type": "module",
-  "dependencies": {
-    "@tailwindcss/vite": "^4.1.11",
-    "alpinejs": "^3.14.9",
-    "axios": "^1.11.0",
-    "tailwindcss": "^4.1.11",
-    "vite": "^7.0.6"
-  }
+  "license": "ISC"
 }

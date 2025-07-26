@@ -5,7 +5,6 @@ import axios from 'axios';
 const quoteApp = () => ({
   // 響應式資料
   quote: "按下按鈕，獲得今天的啟發語錄！",
-  quotes: [],
   favoriteQuotes: [],
   isLoading: false,
   isDarkMode: false,
@@ -17,33 +16,11 @@ const quoteApp = () => ({
   async init() {
     this.loadDarkMode();
     this.loadFavorites();
-    await this.loadQuotes();
+    await this.getRandomQuote();
   },
 
-  // 載入語錄資料
-  async loadQuotes() {
-    try {
-      this.isLoading = true;
-      const response = await axios.get(`${this.apiBaseUrl}/quotes`);
-      this.quotes = response.data.data;
-      this.showRandomQuote();
-    } catch (error) {
-      console.error("載入語錄時發生錯誤：", error);
-      this.quote = "無法載入語錄，請稍後再試。";
-    } finally {
-      this.isLoading = false;
-    }
-  },
-
-  // 顯示隨機語錄（本地版本）
-  showRandomQuote() {
-    if (this.quotes.length === 0) return;
-    const randomIndex = Math.floor(Math.random() * this.quotes.length);
-    this.quote = this.quotes[randomIndex];
-  },
-
-  // 從 API 取得隨機語錄
-  async getRandomQuoteFromAPI() {
+  // 取得隨機語錄
+  async getRandomQuote() {
     try {
       this.isLoading = true;
       const response = await axios.get(`${this.apiBaseUrl}/quotes/random`);
@@ -58,10 +35,10 @@ const quoteApp = () => ({
 
   // 儲存語錄到收藏
   saveFavorite() {
-    // 檢查是否為有效語錄（不是錯誤訊息且不是初始訊息）
+    // 檢查是否為有效語錄（不是錯誤訊息、初始訊息或已收藏）
     const isValidQuote = this.quote && 
-                        this.quotes.length > 0 && 
-                        this.quotes.includes(this.quote) && 
+                        !this.quote.includes("無法") && 
+                        !this.quote.includes("按下按鈕") && 
                         !this.favoriteQuotes.includes(this.quote);
     
     if (isValidQuote) {
@@ -91,10 +68,10 @@ const quoteApp = () => ({
 
   // 檢查是否已收藏或是否為無效語錄
   isFavorited() {
-    // 如果是錯誤訊息、初始訊息或不在語錄列表中，視為無效
+    // 如果是錯誤訊息、初始訊息，視為無效
     const isInvalidQuote = !this.quote || 
-                          this.quotes.length === 0 || 
-                          !this.quotes.includes(this.quote);
+                          this.quote.includes("無法") || 
+                          this.quote.includes("按下按鈕");
     
     return isInvalidQuote || this.favoriteQuotes.includes(this.quote);
   },
