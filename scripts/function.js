@@ -5,9 +5,11 @@ const quoteApp = () => ({
   quotes: [],
   favoriteQuotes: [],
   isLoading: false,
+  isDarkMode: false,
 
   // 初始化
   async init() {
+    this.loadDarkMode();
     this.loadFavorites();
     await this.loadQuotes();
   },
@@ -75,6 +77,32 @@ const quoteApp = () => ({
                           !this.quotes.includes(this.quote);
     
     return isInvalidQuote || this.favoriteQuotes.includes(this.quote);
+  },
+
+  // Dark Mode 相關方法
+  loadDarkMode() {
+    const savedMode = localStorage.getItem("darkMode");
+    this.isDarkMode = savedMode === "true";
+    this.applyDarkMode();
+  },
+
+  toggleDarkMode() {
+    this.isDarkMode = !this.isDarkMode;
+    this.applyDarkMode();
+    this.saveDarkMode();
+  },
+
+  applyDarkMode() {
+    const htmlElement = document.documentElement;
+    if (this.isDarkMode) {
+      htmlElement.classList.add('dark');
+    } else {
+      htmlElement.classList.remove('dark');
+    }
+  },
+
+  saveDarkMode() {
+    localStorage.setItem("darkMode", this.isDarkMode.toString());
   }
 });
 

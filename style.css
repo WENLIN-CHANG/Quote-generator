@@ -1,16 +1,70 @@
 @import "tailwindcss";
 
+/* Dark Mode CSS 變數 */
+:root {
+  --bg-primary: #fef7ed;
+  --bg-secondary: #fef3e2;
+  --bg-card: #fef3e2;
+  --text-primary: #1f2937;
+  --text-secondary: #4b5563;
+  --text-muted: #6b7280;
+  --button-bg: #fbbf24;
+  --button-hover: #f59e0b;
+}
+
+.dark {
+  --bg-primary: #111827;
+  --bg-secondary: #1f2937;
+  --bg-card: #374151;
+  --text-primary: #f9fafb;
+  --text-secondary: #d1d5db;
+  --text-muted: #9ca3af;
+  --button-bg: #d97706;
+  --button-hover: #b45309;
+}
+
 /* 自定義 Tailwind 組件 */
 @layer components {
   .quote-button {
-    @apply bg-amber-300 hover:bg-amber-400 hover:text-white border-none px-6 py-3 text-lg rounded-2xl cursor-pointer transition-colors duration-300 font-medium;
+    background-color: var(--button-bg);
+    color: white;
+    border: none;
+    padding: 0.75rem 1.5rem;
+    font-size: 1.125rem;
+    border-radius: 1rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-weight: 500;
+  }
+  
+  .quote-button:hover:not(:disabled) {
+    background-color: var(--button-hover);
+  }
+  
+  .quote-button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
   }
   
   .favorite-item {
-    @apply bg-gray-50 my-2 px-4 py-3 rounded-lg text-base shadow-sm text-gray-600 text-center;
+    background-color: var(--bg-card);
+    color: var(--text-secondary);
+    margin: 0.5rem 0;
+    padding: 0.75rem 1rem;
+    border-radius: 0.5rem;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    text-align: center;
+    transition: all 0.3s ease;
   }
   
   .delete-btn {
-    @apply ml-2 cursor-pointer text-xl hover:opacity-70 transition-opacity;
+    margin-left: 0.5rem;
+    cursor: pointer;
+    font-size: 1.25rem;
+    transition: opacity 0.2s ease;
+  }
+  
+  .delete-btn:hover {
+    opacity: 0.7;
   }
 }

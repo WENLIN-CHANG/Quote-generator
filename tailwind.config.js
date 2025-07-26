@@ -1,8 +1,10 @@
-/** @type {import('tailwindcss').Config} */
-export default {
+import { defineConfig } from '@tailwindcss/vite'
+
+export default defineConfig({
+  darkMode: 'class',
   content: [
     "./index.html",
-    "./app.js",
+    "./scripts/**/*.js",
     "./**/*.{js,html}"
   ],
   theme: {
@@ -26,5 +28,4 @@ export default {
       }
     },
   },
-  plugins: [],
-}
+})

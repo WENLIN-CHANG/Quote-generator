@@ -9,11 +9,21 @@
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@100..900&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css">
 </head>
-<body class="bg-amber-50 text-gray-800 text-center py-12 px-4 min-h-screen" style="font-family: 'Noto Sans TC', sans-serif;">
+<body class="text-center py-12 px-4 min-h-screen transition-all duration-300" 
+      style="font-family: 'Noto Sans TC', sans-serif; background-color: var(--bg-primary); color: var(--text-primary);">
   <div x-data="quoteApp()" x-init="init()">
-    <h1 class="text-gray-600 mb-12 text-4xl md:text-5xl font-medium">🌞 每日一句小語 🌞</h1>
+    <!-- Dark Mode 切換按鈕 -->
+    <button @click="toggleDarkMode()" 
+            class="fixed top-4 right-4 p-3 rounded-full transition-all duration-200"
+            style="background-color: var(--bg-card); color: var(--text-secondary);"
+            :aria-label="isDarkMode ? '切換到亮色模式' : '切換到暗色模式'">
+      <span x-show="!isDarkMode" class="text-2xl">🌙</span>
+      <span x-show="isDarkMode" class="text-2xl">☀️</span>
+    </button>
     
-    <h2 class="text-gray-700 text-xl mb-6 font-medium">📌 我的收藏語錄</h2>
+    <h1 class="mb-12 text-4xl md:text-5xl font-medium" style="color: var(--text-secondary);">🌞 每日一句小語 🌞</h1>
+    
+    <h2 class="text-xl mb-6 font-medium" style="color: var(--text-secondary);">📌 我的收藏語錄</h2>
     <ul class="max-w-2xl mx-auto list-none p-0 mb-8">
       <template x-for="(favoriteQuote, index) in favoriteQuotes" :key="index">
         <li class="favorite-item">
@@ -23,9 +33,10 @@
       </template>
     </ul>
     
-    <div class="bg-amber-100 p-8 mx-auto my-5 w-full max-w-lg rounded-2xl shadow-lg">
-      <p class="text-2xl leading-relaxed text-gray-800" x-text="quote"></p>
-      <div x-show="isLoading" class="text-sm text-gray-500 mt-2">載入中...</div>
+    <div class="p-8 mx-auto my-5 w-full max-w-lg rounded-2xl shadow-lg transition-all duration-300" 
+         style="background-color: var(--bg-card);">
+      <p class="text-2xl leading-relaxed" style="color: var(--text-primary);" x-text="quote"></p>
+      <div x-show="isLoading" class="text-sm mt-2" style="color: var(--text-muted);">載入中...</div>
     </div>
     
     <div class="mt-6 flex flex-col sm:flex-row gap-3 justify-center items-center">
