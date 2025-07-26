@@ -1,0 +1,17 @@
+{
+  "name": "quote-generator",
+  "version": "1.0.0",
+  "description": "",
+  "main": "app.js",
+  "scripts": {
+    "dev": "vite"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "dependencies": {
+    "alpinejs": "^3.14.9",
+    "vite": "^7.0.6"
+  }
+}
