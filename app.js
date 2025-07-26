@@ -20,6 +20,7 @@ function displayFavorites() {
   favoriteList.innerHTML = ""; // 清空現有列表
   favoriteQuotes.forEach(quote => {
     const listItem = document.createElement("li");
+    listItem.className = "favorite-item"; // 使用 Tailwind 自定義 class
     listItem.textContent = quote;
 
     const deleteBtn = document.createElement("span");
