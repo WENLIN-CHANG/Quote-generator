@@ -43,7 +43,7 @@
     </div>
     
     <div class="mt-6 flex flex-col sm:flex-row gap-3 justify-center items-center">
-      <button @click="showRandomQuote()" class="quote-button" :disabled="isLoading">
+      <button @click="getRandomQuoteFromAPI()" class="quote-button" :disabled="isLoading">
         產生新小語
       </button>
       <button @click="saveFavorite()" class="quote-button" 

@@ -1,3 +1,6 @@
+// 引入 axios
+import axios from 'axios';
+
 // Alpine.js 語錄應用組件
 const quoteApp = () => ({
   // 響應式資料
@@ -6,6 +9,9 @@ const quoteApp = () => ({
   favoriteQuotes: [],
   isLoading: false,
   isDarkMode: false,
+
+  // API 基本 URL (使用 Vite proxy)
+  apiBaseUrl: '/api',
 
   // 初始化
   async init() {
@@ -18,8 +24,8 @@ const quoteApp = () => ({
   async loadQuotes() {
     try {
       this.isLoading = true;
-      const response = await fetch("data/quote.json");
-      this.quotes = await response.json();
+      const response = await axios.get(`${this.apiBaseUrl}/quotes`);
+      this.quotes = response.data.data;
       this.showRandomQuote();
     } catch (error) {
       console.error("載入語錄時發生錯誤：", error);
@@ -29,11 +35,25 @@ const quoteApp = () => ({
     }
   },
 
-  // 顯示隨機語錄
+  // 顯示隨機語錄（本地版本）
   showRandomQuote() {
     if (this.quotes.length === 0) return;
     const randomIndex = Math.floor(Math.random() * this.quotes.length);
     this.quote = this.quotes[randomIndex];
+  },
+
+  // 從 API 取得隨機語錄
+  async getRandomQuoteFromAPI() {
+    try {
+      this.isLoading = true;
+      const response = await axios.get(`${this.apiBaseUrl}/quotes/random`);
+      this.quote = response.data.data.text;
+    } catch (error) {
+      console.error("取得隨機語錄時發生錯誤：", error);
+      this.quote = "無法取得隨機語錄，請稍後再試。";
+    } finally {
+      this.isLoading = false;
+    }
   },
 
   // 儲存語錄到收藏
