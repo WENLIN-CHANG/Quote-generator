@@ -12,13 +12,16 @@
 <body class="text-center py-12 px-4 min-h-screen transition-all duration-300" 
       style="font-family: 'Noto Sans TC', sans-serif; background-color: var(--bg-primary); color: var(--text-primary);">
   <div x-data="quoteApp()" x-init="init()">
-    <!-- Dark Mode 切換按鈕 -->
+    <!-- Dark Mode 滑動切換開關 -->
     <button @click="toggleDarkMode()" 
-            class="fixed top-4 right-4 p-3 rounded-full transition-all duration-200"
-            style="background-color: var(--bg-card); color: var(--text-secondary);"
+            class="fixed top-4 right-4 dark-mode-toggle"
             :aria-label="isDarkMode ? '切換到亮色模式' : '切換到暗色模式'">
-      <span x-show="!isDarkMode" class="text-2xl">🌙</span>
-      <span x-show="isDarkMode" class="text-2xl">☀️</span>
+      <div class="toggle-track" :class="{ 'active': isDarkMode }">
+        <div class="toggle-thumb" :class="{ 'active': isDarkMode }">
+          <span class="toggle-icon sun" :class="{ 'active': !isDarkMode }">☀️</span>
+          <span class="toggle-icon moon" :class="{ 'active': isDarkMode }">🌙</span>
+        </div>
+      </div>
     </button>
     
     <h1 class="mb-12 text-4xl md:text-5xl font-medium" style="color: var(--text-secondary);">🌞 每日一句小語 🌞</h1>
