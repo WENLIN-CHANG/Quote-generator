@@ -10,20 +10,36 @@
   <link rel="stylesheet" href="style.css">
 </head>
 <body class="bg-amber-50 text-gray-800 text-center py-12 px-4 min-h-screen" style="font-family: 'Noto Sans TC', sans-serif;">
-  <h1 class="text-gray-600 mb-12 text-4xl md:text-5xl font-medium">🌞 每日一句小語 🌞</h1>
-  
-  <h2 class="text-gray-700 text-xl mb-6 font-medium">📌 我的收藏語錄</h2>
-  <ul id="favorite_list" class="max-w-2xl mx-auto list-none p-0 mb-8"></ul>
-  
-  <div id="quote_box" class="bg-amber-100 p-8 mx-auto my-5 w-full max-w-lg rounded-2xl shadow-lg">
-    <p id="quote" class="text-2xl leading-relaxed text-gray-800">按下按鈕，獲得今天的啟發語錄！</p>
-  </div>
-  
-  <div class="mt-6 flex flex-col sm:flex-row gap-3 justify-center items-center">
-    <button id="new_quote" class="quote-button">產生新小語</button>
-    <button id="save_fav" class="quote-button">我喜歡這句話 ❤️</button>
+  <div x-data="quoteApp()" x-init="init()">
+    <h1 class="text-gray-600 mb-12 text-4xl md:text-5xl font-medium">🌞 每日一句小語 🌞</h1>
+    
+    <h2 class="text-gray-700 text-xl mb-6 font-medium">📌 我的收藏語錄</h2>
+    <ul class="max-w-2xl mx-auto list-none p-0 mb-8">
+      <template x-for="(favoriteQuote, index) in favoriteQuotes" :key="index">
+        <li class="favorite-item">
+          <span x-text="favoriteQuote"></span>
+          <span class="delete-btn" @click="deleteFavorite(index)">🗑️</span>
+        </li>
+      </template>
+    </ul>
+    
+    <div class="bg-amber-100 p-8 mx-auto my-5 w-full max-w-lg rounded-2xl shadow-lg">
+      <p class="text-2xl leading-relaxed text-gray-800" x-text="quote"></p>
+      <div x-show="isLoading" class="text-sm text-gray-500 mt-2">載入中...</div>
+    </div>
+    
+    <div class="mt-6 flex flex-col sm:flex-row gap-3 justify-center items-center">
+      <button @click="showRandomQuote()" class="quote-button" :disabled="isLoading">
+        產生新小語
+      </button>
+      <button @click="saveFavorite()" class="quote-button" 
+              :disabled="isFavorited() || isLoading"
+              :class="{ 'opacity-50 cursor-not-allowed': isFavorited() }">
+        <span x-text="isFavorited() ? '已收藏 ❤️' : '我喜歡這句話 ❤️'"></span>
+      </button>
+    </div>
   </div>
  
-  <script defer src="app.js"></script>
+  <script type="module" defer src="scripts/app.js"></script>
 </body>
 </html>
