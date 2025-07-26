@@ -36,7 +36,13 @@ const quoteApp = () => ({
 
   // 儲存語錄到收藏
   saveFavorite() {
-    if (this.quote && !this.favoriteQuotes.includes(this.quote)) {
+    // 檢查是否為有效語錄（不是錯誤訊息且不是初始訊息）
+    const isValidQuote = this.quote && 
+                        this.quotes.length > 0 && 
+                        this.quotes.includes(this.quote) && 
+                        !this.favoriteQuotes.includes(this.quote);
+    
+    if (isValidQuote) {
       this.favoriteQuotes.push(this.quote);
       this.saveFavoritesToStorage();
     }
@@ -61,9 +67,14 @@ const quoteApp = () => ({
     localStorage.setItem("favoriteQuotes", JSON.stringify(this.favoriteQuotes));
   },
 
-  // 檢查是否已收藏
+  // 檢查是否已收藏或是否為無效語錄
   isFavorited() {
-    return this.favoriteQuotes.includes(this.quote);
+    // 如果是錯誤訊息、初始訊息或不在語錄列表中，視為無效
+    const isInvalidQuote = !this.quote || 
+                          this.quotes.length === 0 || 
+                          !this.quotes.includes(this.quote);
+    
+    return isInvalidQuote || this.favoriteQuotes.includes(this.quote);
   }
 });
 
