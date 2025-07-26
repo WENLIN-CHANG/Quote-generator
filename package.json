@@ -10,7 +10,16 @@
     "build": "cd frontend && npm run build",
     "install:all": "cd frontend && npm install && cd ../backend && pip install -r requirements.txt"
   },
-  "keywords": ["quote", "generator", "fastapi", "vue", "alpine"],
+  "keywords": [
+    "quote",
+    "generator",
+    "fastapi",
+    "vue",
+    "alpine"
+  ],
   "author": "",
-  "license": "ISC"
+  "license": "ISC",
+  "devDependencies": {
+    "concurrently": "^9.2.0"
+  }
 }
