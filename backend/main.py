@@ -5,10 +5,10 @@ from typing import List
 import json
 import random
 import os
-from models import Quote, QuoteResponse, QuotesResponse
+from models import Quote, QuoteResponse, QuotesResponse, CategoryEnum, CategoriesResponse
 
 # 全域變數存儲語錄資料
-quotes_data: List[str] = []
+quotes_data: List[Quote] = []
 
 def load_quotes():
     """載入語錄資料"""
@@ -16,11 +16,15 @@ def load_quotes():
     try:
         quotes_file = os.path.join(os.path.dirname(__file__), "data", "quotes.json")
         with open(quotes_file, "r", encoding="utf-8") as f:
-            quotes_data = json.load(f)
+            raw_data = json.load(f)
+            quotes_data = [
+                Quote(text=item["text"], category=CategoryEnum(item["category"]), id=idx)
+                for idx, item in enumerate(raw_data)
+            ]
         print(f"成功載入 {len(quotes_data)} 條語錄")
     except Exception as e:
         print(f"載入語錄失敗: {e}")
-        quotes_data = ["無法載入語錄資料"]
+        quotes_data = [Quote(text="無法載入語錄資料", category=CategoryEnum.MOTIVATION, id=0)]
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -71,11 +75,10 @@ async def get_random_quote():
         raise HTTPException(status_code=500, detail="語錄資料尚未載入")
     
     random_quote = random.choice(quotes_data)
-    quote_obj = Quote(text=random_quote, id=quotes_data.index(random_quote))
     
     return QuoteResponse(
         success=True,
-        data=quote_obj,
+        data=random_quote,
         message="成功取得隨機語錄"
     )
 
@@ -88,12 +91,56 @@ async def get_quote_by_id(quote_id: int):
     if quote_id < 0 or quote_id >= len(quotes_data):
         raise HTTPException(status_code=404, detail="語錄ID不存在")
     
-    quote_obj = Quote(text=quotes_data[quote_id], id=quote_id)
+    return QuoteResponse(
+        success=True,
+        data=quotes_data[quote_id],
+        message=f"成功取得語錄 ID: {quote_id}"
+    )
+
+@app.get("/api/categories", response_model=CategoriesResponse, summary="取得所有分類")
+async def get_all_categories():
+    """取得所有語錄分類"""
+    return CategoriesResponse(
+        success=True,
+        data=list(CategoryEnum),
+        message="成功取得所有分類"
+    )
+
+@app.get("/api/quotes/category/{category}", response_model=QuotesResponse, summary="根據分類取得語錄")
+async def get_quotes_by_category(category: CategoryEnum):
+    """根據分類取得語錄"""
+    if not quotes_data:
+        raise HTTPException(status_code=500, detail="語錄資料尚未載入")
+    
+    filtered_quotes = [quote for quote in quotes_data if quote.category == category]
+    
+    if not filtered_quotes:
+        raise HTTPException(status_code=404, detail=f"分類 '{category}' 沒有找到語錄")
+    
+    return QuotesResponse(
+        success=True,
+        data=filtered_quotes,
+        total=len(filtered_quotes),
+        message=f"成功取得分類 '{category}' 的語錄"
+    )
+
+@app.get("/api/quotes/category/{category}/random", response_model=QuoteResponse, summary="根據分類取得隨機語錄")
+async def get_random_quote_by_category(category: CategoryEnum):
+    """根據分類取得一條隨機語錄"""
+    if not quotes_data:
+        raise HTTPException(status_code=500, detail="語錄資料尚未載入")
+    
+    filtered_quotes = [quote for quote in quotes_data if quote.category == category]
+    
+    if not filtered_quotes:
+        raise HTTPException(status_code=404, detail=f"分類 '{category}' 沒有找到語錄")
+    
+    random_quote = random.choice(filtered_quotes)
     
     return QuoteResponse(
         success=True,
-        data=quote_obj,
-        message=f"成功取得語錄 ID: {quote_id}"
+        data=random_quote,
+        message=f"成功取得分類 '{category}' 的隨機語錄"
     )
 
 @app.get("/api/health", summary="健康檢查")

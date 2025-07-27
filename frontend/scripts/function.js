@@ -1,105 +1,75 @@
-// 引入 axios
-import axios from 'axios';
-
-// Alpine.js 語錄應用組件
+// Alpine.js 語錄應用組件 - 使用 $store 模式
 const quoteApp = () => ({
-  // 響應式資料
-  quote: "按下按鈕，獲得今天的啟發語錄！",
-  favoriteQuotes: [],
-  isLoading: false,
-  isDarkMode: false,
-
-  // API 基本 URL (使用 Vite proxy)
-  apiBaseUrl: '/api',
-
   // 初始化
   async init() {
-    this.loadDarkMode();
-    this.loadFavorites();
-    await this.getRandomQuote();
+    await this.$store.quotes.init();
   },
 
   // 取得隨機語錄
   async getRandomQuote() {
-    try {
-      this.isLoading = true;
-      const response = await axios.get(`${this.apiBaseUrl}/quotes/random`);
-      this.quote = response.data.data.text;
-    } catch (error) {
-      console.error("取得隨機語錄時發生錯誤：", error);
-      this.quote = "無法取得隨機語錄，請稍後再試。";
-    } finally {
-      this.isLoading = false;
-    }
+    await this.$store.quotes.getRandomQuote();
   },
 
   // 儲存語錄到收藏
   saveFavorite() {
-    // 檢查是否為有效語錄（不是錯誤訊息、初始訊息或已收藏）
-    const isValidQuote = this.quote && 
-                        !this.quote.includes("無法") && 
-                        !this.quote.includes("按下按鈕") && 
-                        !this.favoriteQuotes.includes(this.quote);
-    
-    if (isValidQuote) {
-      this.favoriteQuotes.push(this.quote);
-      this.saveFavoritesToStorage();
-    }
+    this.$store.quotes.saveFavorite();
   },
 
   // 刪除收藏語錄
   deleteFavorite(index) {
-    this.favoriteQuotes.splice(index, 1);
-    this.saveFavoritesToStorage();
+    this.$store.quotes.deleteFavorite(index);
   },
 
-  // 從 localStorage 載入收藏
-  loadFavorites() {
-    const storedFavorites = localStorage.getItem("favoriteQuotes");
-    if (storedFavorites) {
-      this.favoriteQuotes = JSON.parse(storedFavorites);
-    }
-  },
-
-  // 儲存收藏到 localStorage
-  saveFavoritesToStorage() {
-    localStorage.setItem("favoriteQuotes", JSON.stringify(this.favoriteQuotes));
-  },
-
-  // 檢查是否已收藏或是否為無效語錄
-  isFavorited() {
-    // 如果是錯誤訊息、初始訊息，視為無效
-    const isInvalidQuote = !this.quote || 
-                          this.quote.includes("無法") || 
-                          this.quote.includes("按下按鈕");
-    
-    return isInvalidQuote || this.favoriteQuotes.includes(this.quote);
-  },
-
-  // Dark Mode 相關方法
-  loadDarkMode() {
-    const savedMode = localStorage.getItem("darkMode");
-    this.isDarkMode = savedMode === "true";
-    this.applyDarkMode();
-  },
-
+  // Dark Mode 切換
   toggleDarkMode() {
-    this.isDarkMode = !this.isDarkMode;
-    this.applyDarkMode();
-    this.saveDarkMode();
+    this.$store.quotes.toggleDarkMode();
   },
 
-  applyDarkMode() {
-    const htmlElement = document.documentElement;
-    if (this.isDarkMode) {
-      htmlElement.classList.add('dark');
-    } else {
-      htmlElement.classList.remove('dark');
-    }
+  // 分類切換
+  async changeCategory(category) {
+    await this.$store.quotes.changeCategory(category);
   },
 
-  saveDarkMode() {
-    localStorage.setItem("darkMode", this.isDarkMode.toString());
+  // 檢查是否已收藏
+  isFavorited() {
+    return this.$store.quotes.isFavorited();
+  },
+
+  // 取得當前語錄文字
+  getCurrentQuoteText() {
+    return this.$store.quotes.getCurrentQuoteText();
+  },
+
+  // 取得收藏按鈕文字
+  getFavoriteButtonText() {
+    return this.$store.quotes.getFavoriteButtonText();
+  },
+
+  // 依分類取得收藏語錄
+  getFavoritesByCategory(category) {
+    return this.$store.quotes.getFavoritesByCategory(category);
+  },
+
+  // 取得所有收藏語錄（用於顯示）
+  get favoriteQuotes() {
+    return this.getFavoritesByCategory(this.$store.quotes.selectedCategory);
+  },
+
+  // 其他狀態的快捷訪問
+  get isLoading() {
+    return this.$store.quotes.isLoading;
+  },
+
+  get isDarkMode() {
+    return this.$store.quotes.isDarkMode;
+  },
+
+  get categories() {
+    return this.$store.quotes.categories;
+  },
+
+  get selectedCategory() {
+    return this.$store.quotes.selectedCategory;
   }
 });
 

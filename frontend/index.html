@@ -15,41 +15,75 @@
     <!-- Dark Mode 滑動切換開關 -->
     <button @click="toggleDarkMode()" 
             class="fixed top-4 right-4 dark-mode-toggle"
-            :aria-label="isDarkMode ? '切換到亮色模式' : '切換到暗色模式'">
-      <div class="toggle-track" :class="{ 'active': isDarkMode }">
-        <div class="toggle-thumb" :class="{ 'active': isDarkMode }">
-          <span class="toggle-icon sun" :class="{ 'active': !isDarkMode }">☀️</span>
-          <span class="toggle-icon moon" :class="{ 'active': isDarkMode }">🌙</span>
+            :aria-label="$store.quotes.isDarkMode ? '切換到亮色模式' : '切換到暗色模式'">
+      <div class="toggle-track" :class="{ 'active': $store.quotes.isDarkMode }">
+        <div class="toggle-thumb" :class="{ 'active': $store.quotes.isDarkMode }">
+          <span class="toggle-icon sun" :class="{ 'active': !$store.quotes.isDarkMode }">☀️</span>
+          <span class="toggle-icon moon" :class="{ 'active': $store.quotes.isDarkMode }">🌙</span>
         </div>
       </div>
     </button>
     
-    <h1 class="mb-12 text-4xl md:text-5xl font-medium" style="color: var(--text-secondary);">🌞 每日一句小語 🌞</h1>
+    <h1 class="mb-8 text-4xl md:text-5xl font-medium" style="color: var(--text-secondary);">🌞 每日一句小語 🌞</h1>
     
-    <h2 class="text-xl mb-6 font-medium" style="color: var(--text-secondary);">📌 我的收藏語錄</h2>
+    <!-- 分類選擇器 -->
+    <div class="mb-8">
+      <h3 class="text-lg mb-4 font-medium" style="color: var(--text-secondary);">🏷️ 選擇分類</h3>
+      <div class="category-selector flex flex-wrap justify-center gap-2 max-w-2xl mx-auto">
+        <template x-for="category in $store.quotes.categories" :key="category">
+          <button 
+            @click="changeCategory(category)"
+            :class="{ 
+              'category-button-active': $store.quotes.selectedCategory === category,
+              'category-button': $store.quotes.selectedCategory !== category
+            }"
+            x-text="category">
+          </button>
+        </template>
+      </div>
+    </div>
+    
+    <h2 class="text-xl mb-6 font-medium" style="color: var(--text-secondary);">
+      📌 我的收藏語錄 
+      <span x-show="$store.quotes.selectedCategory !== '全部'" 
+            class="text-sm opacity-70"
+            x-text="'(' + $store.quotes.selectedCategory + ')'">
+      </span>
+    </h2>
     <ul class="max-w-2xl mx-auto list-none p-0 mb-8">
       <template x-for="(favoriteQuote, index) in favoriteQuotes" :key="index">
         <li class="favorite-item">
-          <span x-text="favoriteQuote"></span>
+          <div class="favorite-content">
+            <span x-text="favoriteQuote.text"></span>
+            <small class="favorite-category" x-text="'[' + favoriteQuote.category + ']'"></small>
+          </div>
           <span class="delete-btn" @click="deleteFavorite(index)">🗑️</span>
         </li>
       </template>
+      <li x-show="favoriteQuotes.length === 0" class="text-gray-500 italic py-4">
+        尚無收藏的語錄
+      </li>
     </ul>
     
     <div class="p-8 mx-auto my-5 w-full max-w-lg rounded-2xl shadow-lg transition-all duration-300" 
          style="background-color: var(--bg-card);">
-      <p class="text-2xl leading-relaxed" style="color: var(--text-primary);" x-text="quote"></p>
-      <div x-show="isLoading" class="text-sm mt-2" style="color: var(--text-muted);">載入中...</div>
+      <p class="text-2xl leading-relaxed" style="color: var(--text-primary);" 
+         x-text="$store.quotes.getCurrentQuoteText()"></p>
+      <div x-show="$store.quotes.currentQuote" 
+           class="text-sm mt-3 opacity-70" 
+           style="color: var(--text-muted);"
+           x-text="'[' + ($store.quotes.currentQuote?.category || '') + ']'"></div>
+      <div x-show="$store.quotes.isLoading" class="text-sm mt-2" style="color: var(--text-muted);">載入中...</div>
     </div>
     
     <div class="mt-6 flex flex-col sm:flex-row gap-3 justify-center items-center">
-      <button @click="getRandomQuote()" class="quote-button" :disabled="isLoading">
-        產生新小語
+      <button @click="getRandomQuote()" class="quote-button" :disabled="$store.quotes.isLoading">
+        <span x-text="$store.quotes.selectedCategory === '全部' ? '產生新小語' : '產生新小語（' + $store.quotes.selectedCategory + '）'"></span>
       </button>
       <button @click="saveFavorite()" class="quote-button" 
-              :disabled="isFavorited() || isLoading"
+              :disabled="isFavorited() || $store.quotes.isLoading"
               :class="{ 'opacity-50 cursor-not-allowed': isFavorited() }">
-        <span x-text="isFavorited() ? '已收藏 ❤️' : '我喜歡這句話 ❤️'"></span>
+        <span x-text="getFavoriteButtonText()"></span>
       </button>
     </div>
   </div>
